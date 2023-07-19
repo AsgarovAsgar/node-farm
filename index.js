@@ -34,13 +34,52 @@ const url = require('url')
 /////////////////
 // SERVER
 
-const server = http.createServer((req, res) => {
-  const pathName = req.url
+const replaceTemplate = (temp, product) => {
+  let output = temp.replace(/{{productName}}/g, product.productName)
+  output = output.replace(/{{image}}/g, product.image)
+  output = output.replace(/{{price}}/g, product.price)
+  output = output.replace(/{{from}}/g, product.from)
+  output = output.replace(/{{nutrients}}/g, product.nutrients)
+  output = output.replace(/{{quantity}}/g, product.quantity)
+  output = output.replace(/{{description}}/g, product.description)
+  output = output.replace(/{{id}}/g, product.id)
 
-  if(pathName === '/overview') {
-    res.end('this is overview')
-  } else if(pathName === '/product') {
-    res.end('this is product')
+  if(!product.organic) output = output.replace(/{{notOrganic}}/g, 'not-organic')
+
+  return output
+}
+
+const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8')
+const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8')
+const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8')
+
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`)
+const dataObj = JSON.parse(data)
+
+const server = http.createServer((req, res) => {
+  const { query, pathname } = url.parse(req.url, true)
+
+  // overview page
+  if(pathname === '/' || pathname === '/overview') {
+    res.writeHead(200, { 'Content-type': 'text/html' })
+
+    const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('')
+    console.log(cardsHtml);
+
+    const output = tempOverview.replace('{{productCards}}', cardsHtml)
+    
+    res.end(output)
+
+  // product page
+  } else if(pathname === '/product') {
+    res.writeHead(200, { 'Content-type': 'text/html' })
+    const product = dataObj[query.id]
+    const output = replaceTemplate(tempProduct, product)
+
+    res.end(output)
+  } else if(pathname === '/api') {
+    res.writeHead(200, { 'Content-type': 'application/json' })
+    res.end(data)
   } else {
     res.writeHead(404, {
       'Content-type': 'text/html',
