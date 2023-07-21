@@ -45,7 +45,6 @@ const replaceTemplate = (temp, product) => {
   output = output.replace(/{{id}}/g, product.id)
 
   if(!product.organic) output = output.replace(/{{notOrganic}}/g, 'not-organic')
-
   return output
 }
 
@@ -77,9 +76,13 @@ const server = http.createServer((req, res) => {
     const output = replaceTemplate(tempProduct, product)
 
     res.end(output)
+
+    // api
   } else if(pathname === '/api') {
     res.writeHead(200, { 'Content-type': 'application/json' })
     res.end(data)
+
+    // 404 page
   } else {
     res.writeHead(404, {
       'Content-type': 'text/html',
@@ -87,10 +90,9 @@ const server = http.createServer((req, res) => {
     })
     res.end('not found')
   }
-
 })
 
 server.listen(8000, '127.0.0.1', () => {
-  console.log('Listen to req on port 8000');
+  console.log('Listen to the request on port 8000');
 })
 
