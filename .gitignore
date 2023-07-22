@@ -1,19 +1,8 @@
-# Dependency directories
-node_modules/
-jspm_packages/
+# Ignore Mac system files
+.DS_store
 
-# TypeScript v1 declaration files
-typings/
+# Ignore node_modules folder
+node_modules
 
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# dotenv environment variables file
+# Ignore files related to API keys
 .env
-
-# macOS
-.DS_Store
-
